@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+
+name: Prettier
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - README.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdownlint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+          cache: npm
+
+      - name: Checkout libmerr
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Prettier check
+        run: |
+          npm run prettier:check

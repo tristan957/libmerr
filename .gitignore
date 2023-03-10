@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+
+/node_modules/
+/package-lock.json
+/subprojects/*
+!/subprojects/libbsd.wrap
+/yarn.lock

@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: Copyright 2021 Micron Technology, Inc.
+# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+
+[wrap-file]
+directory = libbsd-0.11.7
+
+source_url = https://github.com/freedesktop/libbsd/archive/refs/tags/0.11.7.tar.gz
+source_filename = 0.11.7.tar.gz
+source_hash = 9179e5acef79216f11f804e163bf5575f4cf462f42dcce9248a24efda08bcbf1
+
+patch_directory=libbsd
+
+[provide]
+dependency_names = libbsd

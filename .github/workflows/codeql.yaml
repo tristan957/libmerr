@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+"
+    paths:
+      - "**.c"
+      - "**.h"
+      - .github/workflows/codeql.yaml
+  pull_request:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+"
+    paths:
+      - "**.c"
+      - "**.h"
+      - .github/workflows/codeql.yaml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y meson libbsd-dev
+
+      - name: Checkout libmerr
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+
+      - name: Setup
+        run: |
+          meson setup build --fatal-meson-warnings --werror
+
+      - name: Build
+        run: |
+          ninja -C build
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
