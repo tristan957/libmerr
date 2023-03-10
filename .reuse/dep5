@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: https://github.com/tristan957/libmerr
+
+Files: package.json VERSION
+Copyright:
+    2023 Tristan Partin <tristan@partin.io>
+License: Apache-2.0 OR MIT

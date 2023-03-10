@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "markdownlint:check": "markdownlint-cli2 README.md",
+    "prettier:check": "prettier --check README.md package.json .prettierrc.yaml .github/**/*.yaml",
+    "prettier:format": "prettier --write README.md package.json .prettierrc.yaml .github/**/*.yaml"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.6.0",
+    "prettier": "^2.8.4"
+  }
+}

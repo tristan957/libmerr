@@ -1,0 +1,93 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+
+name: Builds
+
+on:
+  release:
+    types: [created]
+  push:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+"
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**/meson.build"
+      - .github/workflows/builds.yaml
+      - meson_options.txt
+      - VERSION
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**/meson.build"
+      - .github/workflows/builds.yaml
+      - meson_options.txt
+      - VERSION
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  normal:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        buildtype: [debug, release]
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y meson
+
+      - name: Checkout libmerr
+        uses: actions/checkout@v3
+
+      - name: Setup
+        run: |
+          meson setup build --fatal-meson-warnings --werror \
+            --buildtype=${{ matrix.buildtype }}
+
+      - name: Build
+        run: |
+          ninja -C build
+
+      - name: Test
+        run: |
+          meson test -C build --print-errorlogs --no-stdsplit
+
+  asan-ubsan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        buildtype: [debug, release]
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y meson
+
+      - name: Checkout libmerr
+        uses: actions/checkout@v3
+
+      - name: Setup
+        run: |
+          meson setup build --fatal-meson-warnings --werror \
+            --buildtype=${{ matrix.buildtype }} -Db_sanitize=address,undefined
+
+      - name: Build
+        run: |
+          ninja -C build
+
+      - name: Test
+        run: |
+          meson test -C build --print-errorlogs --no-stdsplit
