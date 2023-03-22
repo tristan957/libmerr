@@ -4,13 +4,17 @@
  * SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
  */
 
+#include "config.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+#ifdef WITH_LIBBSD
 #include <bsd/string.h>
+#endif
 
 #include <merr.h>
 

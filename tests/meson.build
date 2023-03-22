@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 # SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
 
@@ -11,13 +11,11 @@ test_env = environment({
 })
 
 tests = [
-    'merr-test.c',
+    'merr-test',
 ]
 
 foreach t : tests
-    name = fs.stem(t)
+    e = executable(t, '@0@.c'.format(t), dependencies: [libmerr_dep, glib_dep])
 
-    e = executable(name, t, dependencies: [libmerr_dep, glib_dep])
-
-    test(name, e, env: test_env, protocol: 'tap')
+    test(t, e, env: test_env, protocol: 'tap')
 endforeach

@@ -80,6 +80,8 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
+  - Regex: '"config.h"'
+    Priority: 1
   - Regex: "^<glib.h>"
     Priority: 4
   - Regex: "^<bsd/"

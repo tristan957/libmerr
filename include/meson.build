@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 # SPDX-FileCopyrightText: Copyright 2022 Micron Technology, Inc.
 # SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
