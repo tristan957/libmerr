@@ -73,6 +73,9 @@ test_merr_with_context(void)
     size_t found_sz, expected_sz;
     char found[512], expected[512];
 
+    err = merrx(ENOENT, UINT16_MAX + 1);
+    g_assert_cmpint(merr_errno(err), ==, EINVAL);
+
 #ifdef MERR_REL_SRC_DIR
     /* Point the file pointer past the prefix in order to retrieve the file
      * path relative to the root of the source tree.
