@@ -181,8 +181,8 @@ could return an `enum` instead of an `int16_t` for `example_err_ctx()`.
 - Source files longer than `UINT16_MAX` lines.
 - More than 1024 files in the consuming project (This limit is dependent on max
   path length, `(1 << bit width of file offset) / MERR_MAX_PATH_LENGTH`).
-- Paths longer than 64 characters (Recommended to use `-fmacro-prefix-map` or an
-  equivalent).
+- Paths longer than `MERR_MAX_PATH_LENGTH` characters (Recommended to use
+  `-fmacro-prefix-map` or an equivalent).
 - Error values other than those in `errno(3)`. This could be changed in the
   future to be generic if anyone ever wanted this capability.
 
