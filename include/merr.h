@@ -104,7 +104,7 @@ merr_stringify(uint16_t num);
 #define merr(_errnum) merrx((_errnum), 0)
 
 /**
- * @brief Pack given error number, call-site info, and context into a merr_t.
+ * @brief Pack given error number, call-site info, and context into an merr_t.
  *
  * @param _errnum Error number.
  * @param _ctx Context.
