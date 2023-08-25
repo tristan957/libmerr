@@ -42,7 +42,8 @@ add_project_arguments(
     language: 'c'
 )
 
-add_project_arguments(cc.get_supported_arguments(
+add_project_arguments(
+    cc.get_supported_arguments(
         '-D_POSIX_C_SOURCE=200112L',
         '-Wdeclaration-after-statement',
         '-Wconversion'
