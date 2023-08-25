@@ -26,6 +26,12 @@ extern "C" {
 #error "Compiler must support the section attribute"
 #endif
 
+#if __has_attribute(always_inline)
+#define MERR_ALWAYS_INLINE inline __attribute__((always_inline))
+#else
+#define MERR_ALWAYS_INLINE inline
+#endif
+
 #if __has_attribute(const)
 #define MERR_CONST __attribute__((const))
 #else
@@ -42,12 +48,6 @@ extern "C" {
 #define MERR_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #else
 #define MERR_WARN_UNUSED_RESULT
-#endif
-
-#if __has_attribute(always_inline)
-#define MERR_ALWAYS_INLINE inline __attribute__((always_inline))
-#else
-#define MERR_ALWAYS_INLINE inline
 #endif
 
 // Alignment of merr_curr_file in section "merr"
