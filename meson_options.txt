@@ -2,5 +2,7 @@
 #
 # SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
 
+option('plain', type: 'feature', value: 'auto',
+    description: 'Include file and line number with error number')
 option('tests', type: 'boolean', value: true,
     description: 'Build tests')

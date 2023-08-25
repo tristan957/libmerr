@@ -14,6 +14,12 @@
 
 #include <merr.h>
 
+#if __has_attribute(unused) && defined(MERR_PLAIN)
+#define MERR_PLAIN_UNUSED __attribute__((unused))
+#else
+#define MERR_PLAIN_UNUSED
+#endif
+
 extern char merr_base[];
 extern char merr_bug0[];
 extern char merr_bug1[];
@@ -30,6 +36,7 @@ ctx_stringify(const int ctx)
     return "My context";
 }
 
+#ifndef MERR_PLAIN
 static void
 test_merr_bad_file(void)
 {
@@ -63,21 +70,24 @@ test_merr_long_path(void)
     g_assert_cmpuint(found_sz, ==, expected_sz);
     g_assert_cmpstr(found, ==, expected);
 }
+#endif
 
 static void
 test_merr_with_context(void)
 {
-    int line;
     merr_t err;
-    const char *file = __FILE__;
+    int line MERR_PLAIN_UNUSED;
     size_t found_sz, expected_sz;
     char found[512], expected[512];
+    const char *file MERR_PLAIN_UNUSED = __FILE__;
 
+#ifndef MERR_PLAIN
     err = merrx(ENOENT, INT16_MAX + 1);
     g_assert_cmpint(merr_errno(err), ==, EINVAL);
 
     err = merrx(ENOENT, INT16_MIN - 1);
     g_assert_cmpint(merr_errno(err), ==, EINVAL);
+#endif
 
 #ifdef MERR_REL_SRC_DIR
     /* Point the file pointer past the prefix in order to retrieve the file
@@ -88,14 +98,23 @@ test_merr_with_context(void)
 
     // clang-format off
     err = merrx(ENOENT, 2); line = __LINE__;
-    // clang-format on
+#ifndef MERR_PLAIN
     expected_sz = (size_t)snprintf(
         expected, sizeof(expected), "%s:%d: %s (%d): %s (%u)", file, merr_lineno(err),
         strerror(merr_errno(err)), merr_errno(err), ctx_stringify(merr_ctx(err)), merr_ctx(err));
+#else
+    expected_sz = (size_t)snprintf(
+        expected, sizeof(expected), "%s (%d): %s (%u)",
+        strerror(merr_errno(err)), merr_errno(err), ctx_stringify(merr_ctx(err)), merr_ctx(err));
+#endif
+
+    // clang-format on
     found_sz = merr_strerrorx(err, found, sizeof(found), ctx_stringify);
     g_assert_cmpint(merr_ctx(err), ==, 2);
+#ifndef MERR_PLAIN
     g_assert_cmpint(merr_lineno(err), ==, line);
     g_assert_cmpstr(merr_file(err), ==, file);
+#endif
     g_assert_cmpuint(found_sz, ==, expected_sz);
     g_assert_cmpstr(found, ==, expected);
     found_sz = merr_strerrorx(err, NULL, 0, ctx_stringify);
@@ -116,8 +135,10 @@ test_merr_none(void)
     g_assert_cmpint(err, ==, 0);
     g_assert_cmpint(merr_errno(err), ==, 0);
     g_assert_cmpint(merr_ctx(err), ==, 0);
+#ifndef MERR_PLAIN
     g_assert_cmpint(merr_lineno(err), ==, 0);
     g_assert_null(merr_file(err));
+#endif
     g_assert_cmpuint(found_sz, ==, 7);
     g_assert_cmpstr(found, ==, "Success");
 }
@@ -125,11 +146,11 @@ test_merr_none(void)
 static void
 test_merr_without_context(void)
 {
-    int line;
     merr_t err;
-    const char *file = __FILE__;
+    int line MERR_PLAIN_UNUSED;
     size_t found_sz, expected_sz;
     char found[512], expected[512];
+    const char *file MERR_PLAIN_UNUSED = __FILE__;
 
 #ifdef MERR_REL_SRC_DIR
     /* Point the file pointer past the prefix in order to retrieve the file
@@ -140,14 +161,25 @@ test_merr_without_context(void)
 
     // clang-format off
     err = merr(ENOENT); line = __LINE__;
-    // clang-format on
+
+#ifndef MERR_PLAIN
     expected_sz = (size_t)snprintf(
         expected, sizeof(expected), "%s:%d: %s (%d)", file, merr_lineno(err),
         strerror(merr_errno(err)), merr_errno(err));
+#else
+    expected_sz = (size_t)snprintf(
+        expected, sizeof(expected), "%s (%d)",
+        strerror(merr_errno(err)), merr_errno(err));
+#endif
+
+    // clang-format on
     found_sz = merr_strerror(err, found, sizeof(found));
     g_assert_cmpint(merr_errno(err), ==, 2);
+    g_assert_cmpint(merr_ctx(err), ==, 0);
+#ifndef MERR_PLAIN
     g_assert_cmpint(merr_lineno(err), ==, line);
     g_assert_cmpstr(merr_file(err), ==, file);
+#endif
     g_assert_cmpuint(found_sz, ==, expected_sz);
     g_assert_cmpstr(found, ==, expected);
     found_sz = merr_strerror(err, NULL, 0);
@@ -161,8 +193,10 @@ main(int argc, char *argv[])
 {
     g_test_init(&argc, &argv, NULL);
 
+#ifndef MERR_PLAIN
     g_test_add_func("/merr/bad-file", test_merr_bad_file);
     g_test_add_func("/merr/long-path", test_merr_long_path);
+#endif
     g_test_add_func("/merr/none", test_merr_none);
     g_test_add_func("/merr/with-context", test_merr_with_context);
     g_test_add_func("/merr/without-context", test_merr_without_context);

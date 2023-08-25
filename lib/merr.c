@@ -20,6 +20,7 @@
 #define MERR_UNUSED
 #endif
 
+#ifndef MERR_PLAIN
 char merr_base[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_base";
 char merr_bug0[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug0";
 char merr_bug1[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug1";
@@ -27,6 +28,7 @@ char merr_bug2[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug2";
 
 extern uint8_t __start_merr;
 extern uint8_t __stop_merr;
+#endif
 
 #ifndef HAVE_STRLCPY
 
@@ -53,6 +55,8 @@ strlcpy(char * const dst, const char * const src, const size_t sz)
 }
 
 #endif
+
+#ifndef MERR_PLAIN
 
 const char *
 merr_file(const merr_t err)
@@ -114,6 +118,27 @@ merr_pack(const int errnum, const int ctx, const char *file, const uint16_t line
     return err;
 }
 
+#else
+
+merr_t
+merr_pack(const int errnum, const int ctx)
+{
+    merr_t err = 0;
+
+    if (errnum == 0)
+        return 0;
+
+    if (errnum < INT32_MIN || errnum > INT32_MAX || ctx < INT32_MIN || ctx > INT32_MAX)
+        return merr(EINVAL);
+
+    err |= ((int64_t)ctx << MERR_CTX_SHIFT);
+    err |= (int64_t)errnum & MERR_ERRNO_MASK;
+
+    return err;
+}
+
+#endif
+
 static size_t
 strerror_safe(const merr_t err, char * const buf, const size_t buf_sz)
 {
@@ -138,9 +163,8 @@ size_t
 merr_strerrorx(const merr_t err, char * const buf, size_t buf_sz, merr_stringify ctx_stringify)
 {
     int ret;
-    int16_t ctx;
     size_t sz = 0;
-    const char *file;
+    MERR_CTX_TYPE ctx;
 
     if (!buf && buf_sz > 0)
         buf_sz = 0;
@@ -148,23 +172,29 @@ merr_strerrorx(const merr_t err, char * const buf, size_t buf_sz, merr_stringify
     if (!err)
         return strlcpy(buf, "Success", buf_sz);
 
-    file = merr_file(err);
-    if (file) {
-        const char *ptr;
+#ifndef MERR_PLAIN
+    {
+        const char *file;
 
-        // Protect against files that may be too long.
-        ptr = memchr(file, '\0', MERR_MAX_PATH_LENGTH);
-        ret = snprintf(
-            buf, buf_sz, "%*s:%d: ", (int)(ptr ? ptr - file : MERR_MAX_PATH_LENGTH), file,
-            merr_lineno(err));
+        file = merr_file(err);
+        if (file) {
+            const char *ptr;
 
-        if (ret < 0) {
-            sz = strlcpy(buf, "<failed to format the error message>", buf_sz);
-            goto out;
+            // Protect against files that may be too long.
+            ptr = memchr(file, '\0', MERR_MAX_PATH_LENGTH);
+            ret = snprintf(
+                buf, buf_sz, "%*s:%d: ", (int)(ptr ? ptr - file : MERR_MAX_PATH_LENGTH), file,
+                merr_lineno(err));
+
+            if (ret < 0) {
+                sz = strlcpy(buf, "<failed to format the error message>", buf_sz);
+                goto out;
+            }
+
+            sz += (size_t)ret;
         }
-
-        sz += (size_t)ret;
     }
+#endif
 
     if (sz >= buf_sz) {
         sz += strerror_safe(err, NULL, 0);

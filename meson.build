@@ -13,7 +13,7 @@ project(
         'c_std=c99',
         'warning_level=3',
     ],
-    meson_version: '>= 0.59.0'
+    meson_version: '>= 0.63.0'
 )
 
 fs = import('fs', required: get_option('tests'))

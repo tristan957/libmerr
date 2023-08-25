@@ -34,6 +34,47 @@ meson compile -C build
 meson install -C build
 ```
 
+## Plain Builds
+
+`libmerr` supports a `plain` build alongside the regular build. The `plain`
+build is essentially just a wrapper around `(ctx << 32 | errno)`. It exists in
+the case that you want `merr()` call sites to be the same regardless of whether
+the compiler supports the prerequisites of `libmerr`, such as the `aligned` and
+`section` function attributes. The build system will automatically pick whether
+you need the plain build or not based on the compiler. However, a build option
+`-Dplain=enabled/auto/disabled` is available in the event you want to be
+explicit.
+
+Here are the relevant differences between a regular build and a `plain` build:
+
+```c
+/* Layout of merr_t:
+ *
+ *   If the compiler supports both the section and aligned attributes and
+ *   MERR_PLAIN was not requested:
+ *
+ *     Field   #bits  Description
+ *     ------  -----  ----------
+ *     63..48   16    signed offset of (merr_curr_file - merr_base) / MERR_MAX_PATH_LENGTH
+ *     47..32   16    line number
+ *     31..16   16    context
+ *     15..0    16    error value
+ *
+ *   If the compiler does not support either of the section or aligned
+ *   attributes, or MERR_PLAIN was requested:
+ *
+ *     Field   #bits  Description
+ *     ------  -----  ----------
+ *     63..32   32    context
+ *     31..0    32    error value
+ */
+```
+
+`plain` builds will not have any file or line number information attached to an
+`merr_t`. Therefore, `merr_file()` and `merr_lineno()` do not exist.
+`merr_strerror()` and `merr_strerrorx()` will not be able to output the file and
+line number of the error.
+
 ## Exposing `merr_t`
 
 Exposing `merr_t` directly in public APIs can be an issue if your library can be
@@ -140,7 +181,7 @@ ctx_strerror(const int ctx)
   return NULL;
 }
 
-int16_t
+int16_t // or int32_t in the case of a plain build
 example_err_ctx(example_err_t err)
 {
   return merr_ctx(err);
@@ -172,11 +213,14 @@ example_err_strerror(example_err_t err, char *buf, size_t buf_sz)
 ```
 
 Remember that you can change return types in your functions. For instance, you
-could return an `enum` instead of an `int16_t` for `example_err_ctx()`.
+could return an `enum` instead of an `int16_t` (or `int32_t` in the case of a
+`plain` build) for `example_err_ctx()`.
 
 ## Limits
 
 `libmerr` cannot be used reliably if any of the following conditions are met:
+
+_Only the first and last bullets apply for_ `plain` _builds_.
 
 - Source files longer than `UINT16_MAX` lines.
 - More than 1024 files in the consuming project (This limit is dependent on max
@@ -188,7 +232,10 @@ could return an `enum` instead of an `int16_t` for `example_err_ctx()`.
 
 ## Warnings
 
-- Do not try to use this library as a shared library. It will not work.
+- Do not try to use this library as a shared library. It will not work. _This
+  would work for_ `plain` _builds, but it is not a supported configuration
+  because it is strongly encouraged to wrap_ `merr_t` _as done in the example
+  above._
   - For Meson users, I highly suggest using a wrap file to integrate this into
     your project.
 

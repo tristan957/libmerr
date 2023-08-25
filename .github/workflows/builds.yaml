@@ -38,15 +38,18 @@ concurrency:
 jobs:
   normal:
     runs-on: ubuntu-latest
+    container: quay.io/fedora/fedora:38
     strategy:
       fail-fast: true
       matrix:
         buildtype: [debug, release]
+        plain: [enabled, disabled]
 
     steps:
       - name: Install dependencies
         run: |
-          sudo apt-get install -y meson
+          dnf install --assumeyes --setopt=install_weak_deps=False \
+            gcc meson glib2-devel
 
       - name: Checkout libmerr
         uses: actions/checkout@v3
@@ -54,7 +57,7 @@ jobs:
       - name: Setup
         run: |
           meson setup build --fatal-meson-warnings --werror \
-            --buildtype=${{ matrix.buildtype }}
+            --buildtype=${{ matrix.buildtype }} -Dplain=${{ matrix.plain }}
 
       - name: Build
         run: |
@@ -63,18 +66,29 @@ jobs:
       - name: Test
         run: |
           meson test -C build --print-errorlogs --no-stdsplit
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
+          path: |
+            build/meson-logs/
 
   asan-ubsan:
     runs-on: ubuntu-latest
+    container: quay.io/fedora/fedora:38
     strategy:
       fail-fast: true
       matrix:
         buildtype: [debug, release]
+        plain: [enabled, disabled]
 
     steps:
       - name: Install dependencies
         run: |
-          sudo apt-get install -y meson
+          dnf install --assumeyes --setopt=install_weak_deps=False \
+            gcc meson glib2-devel libasan libubsan
 
       - name: Checkout libmerr
         uses: actions/checkout@v3
@@ -82,7 +96,8 @@ jobs:
       - name: Setup
         run: |
           meson setup build --fatal-meson-warnings --werror \
-            --buildtype=${{ matrix.buildtype }} -Db_sanitize=address,undefined
+            --buildtype=${{ matrix.buildtype }} -Db_sanitize=address,undefined \
+            -Dplain=${{ matrix.plain }}
 
       - name: Build
         run: |
@@ -91,3 +106,11 @@ jobs:
       - name: Test
         run: |
           meson test -C build --print-errorlogs --no-stdsplit
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
+          path: |
+            build/meson-logs/

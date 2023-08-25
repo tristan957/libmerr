@@ -33,11 +33,13 @@ permissions:
 jobs:
   codeql:
     runs-on: ubuntu-latest
+    container: quay.io/fedora/fedora:38
 
     steps:
       - name: Install dependencies
         run: |
-          sudo apt-get install -y meson
+          dnf install --assumeyes --setopt=install_weak_deps=False \
+            gcc meson glib2-devel
 
       - name: Checkout libmerr
         uses: actions/checkout@v3
