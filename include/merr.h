@@ -26,6 +26,12 @@ extern "C" {
 #error "Compiler must support the section attribute"
 #endif
 
+#if __has_attribute(const)
+#define MERR_CONST __attribute__((const))
+#else
+#define MERR_CONST
+#endif
+
 #if __has_attribute(used)
 #define MERR_USED __attribute__((used))
 #else
@@ -118,7 +124,7 @@ merr_stringify(uint16_t num);
  * @param err Error.
  * @returns Error context.
  */
-static MERR_ALWAYS_INLINE uint16_t MERR_USED MERR_WARN_UNUSED_RESULT
+static MERR_ALWAYS_INLINE uint16_t MERR_CONST MERR_USED MERR_WARN_UNUSED_RESULT
 merr_ctx(const merr_t err)
 {
     return (uint16_t)((err & MERR_CTX_MASK) >> MERR_CTX_SHIFT);
@@ -130,7 +136,7 @@ merr_ctx(const merr_t err)
  * @param err Error.
  * @returns Error number.
  */
-static MERR_ALWAYS_INLINE int MERR_USED MERR_WARN_UNUSED_RESULT
+static MERR_ALWAYS_INLINE int MERR_CONST MERR_USED MERR_WARN_UNUSED_RESULT
 merr_errno(const merr_t err)
 {
     return err & MERR_ERRNO_MASK;
@@ -146,7 +152,7 @@ merr_errno(const merr_t err)
  * @returns File name.
  */
 const char *
-merr_file(merr_t err) MERR_WARN_UNUSED_RESULT;
+merr_file(merr_t err) MERR_CONST MERR_WARN_UNUSED_RESULT;
 
 /**
  * @brief Get the line number the error was generated on.
@@ -154,7 +160,7 @@ merr_file(merr_t err) MERR_WARN_UNUSED_RESULT;
  * @param err Error.
  * @returns Line number.
  */
-static MERR_ALWAYS_INLINE uint16_t MERR_USED MERR_WARN_UNUSED_RESULT
+static MERR_ALWAYS_INLINE uint16_t MERR_CONST MERR_USED MERR_WARN_UNUSED_RESULT
 merr_lineno(const merr_t err)
 {
     return (uint16_t)((err & MERR_LINE_MASK) >> MERR_LINE_SHIFT);
@@ -184,7 +190,7 @@ merr_strerrorx(merr_t err, char *buf, size_t buf_sz, merr_stringify ctx_stringif
 
 // This is not public API. DO NOT USE.
 merr_t
-merr_pack(int errnum, unsigned int ctx, const char *file, uint16_t line) MERR_WARN_UNUSED_RESULT;
+merr_pack(int errnum, unsigned int ctx, const char *file, uint16_t line) MERR_CONST MERR_WARN_UNUSED_RESULT;
 
 #ifdef __cplusplus
 }

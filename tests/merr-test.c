@@ -22,7 +22,7 @@ extern char merr_bug2[];
 extern uint8_t __start_merr;
 extern uint8_t __stop_merr;
 
-static const char *
+static const char * MERR_CONST
 ctx_stringify(const uint16_t ctx)
 {
     (void)ctx;
