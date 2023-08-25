@@ -87,11 +87,11 @@ typedef int64_t merr_t;
  * Returning NULL from your implementation will cause the string to not be
  * printed in merr_strerror().
  *
- * @param num Error context value.
+ * @param num Error number.
  * @returns NULL-terminated statically allocated string.
  */
 typedef const char *
-merr_stringify(uint16_t num);
+merr_stringify(int num);
 
 /**
  * @brief Helper macro for casting a function to merr_stringify.
@@ -123,10 +123,10 @@ merr_stringify(uint16_t num);
  * @param err Error.
  * @returns Error context.
  */
-static MERR_ALWAYS_INLINE uint16_t MERR_CONST MERR_USED MERR_WARN_UNUSED_RESULT
+static MERR_ALWAYS_INLINE int16_t MERR_CONST MERR_USED MERR_WARN_UNUSED_RESULT
 merr_ctx(const merr_t err)
 {
-    return (uint16_t)((err & MERR_CTX_MASK) >> MERR_CTX_SHIFT);
+    return (int16_t)((err & MERR_CTX_MASK) >> MERR_CTX_SHIFT);
 }
 
 /**
@@ -189,7 +189,7 @@ merr_strerrorx(merr_t err, char *buf, size_t buf_sz, merr_stringify ctx_stringif
 
 // This is not public API. DO NOT USE.
 merr_t
-merr_pack(int errnum, unsigned int ctx, const char *file, uint16_t line) MERR_CONST MERR_WARN_UNUSED_RESULT;
+merr_pack(int errnum, int ctx, const char *file, uint16_t line) MERR_CONST MERR_WARN_UNUSED_RESULT;
 
 #ifdef __cplusplus
 }

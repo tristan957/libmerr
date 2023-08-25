@@ -85,7 +85,7 @@ merr_file(const merr_t err)
 }
 
 merr_t
-merr_pack(const int errnum, const unsigned int ctx, const char *file, const uint16_t line)
+merr_pack(const int errnum, const int ctx, const char *file, const uint16_t line)
 {
     int64_t off;
     merr_t err = 0;
@@ -93,7 +93,7 @@ merr_pack(const int errnum, const unsigned int ctx, const char *file, const uint
     if (errnum == 0)
         return 0;
 
-    if (errnum < INT16_MIN || errnum > INT16_MAX || ctx > UINT16_MAX)
+    if (errnum < INT16_MIN || errnum > INT16_MAX || ctx < INT16_MIN || ctx > INT16_MAX)
         return merr(EINVAL);
 
     if (file < (char *)&__start_merr || file >= (char *)&__stop_merr) {
@@ -138,7 +138,7 @@ size_t
 merr_strerrorx(const merr_t err, char * const buf, size_t buf_sz, merr_stringify ctx_stringify)
 {
     int ret;
-    uint16_t ctx;
+    int16_t ctx;
     size_t sz = 0;
     const char *file;
 

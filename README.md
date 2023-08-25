@@ -103,7 +103,7 @@ like the following:
 // You could just use int64_t here.
 typedef @MERR_TYPE@ example_err_t;
 
-uint16_t
+int16_t
 example_err_ctx(example_err_t err);
 
 int
@@ -130,7 +130,7 @@ example_err_strerror(example_err_t err, char *buf, size_t buf_sz);
 #include <libexample.h>
 
 static const char *
-ctx_strerror(const uint16_t ctx)
+ctx_strerror(const int ctx)
 {
   switch (ctx) {
   case 0:
@@ -140,7 +140,7 @@ ctx_strerror(const uint16_t ctx)
   return NULL;
 }
 
-uint16_t
+int16_t
 example_err_ctx(example_err_t err)
 {
   return merr_ctx(err);
@@ -172,7 +172,7 @@ example_err_strerror(example_err_t err, char *buf, size_t buf_sz)
 ```
 
 Remember that you can change return types in your functions. For instance, you
-could return an `enum` instead of a `uint16_t` for `example_err_ctx()`.
+could return an `enum` instead of an `int16_t` for `example_err_ctx()`.
 
 ## Limits
 

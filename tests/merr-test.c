@@ -23,7 +23,7 @@ extern uint8_t __start_merr;
 extern uint8_t __stop_merr;
 
 static const char * MERR_CONST
-ctx_stringify(const uint16_t ctx)
+ctx_stringify(const int ctx)
 {
     (void)ctx;
 
@@ -73,7 +73,10 @@ test_merr_with_context(void)
     size_t found_sz, expected_sz;
     char found[512], expected[512];
 
-    err = merrx(ENOENT, UINT16_MAX + 1);
+    err = merrx(ENOENT, INT16_MAX + 1);
+    g_assert_cmpint(merr_errno(err), ==, EINVAL);
+
+    err = merrx(ENOENT, INT16_MIN - 1);
     g_assert_cmpint(merr_errno(err), ==, EINVAL);
 
 #ifdef MERR_REL_SRC_DIR
@@ -90,7 +93,7 @@ test_merr_with_context(void)
         expected, sizeof(expected), "%s:%d: %s (%d): %s (%u)", file, merr_lineno(err),
         strerror(merr_errno(err)), merr_errno(err), ctx_stringify(merr_ctx(err)), merr_ctx(err));
     found_sz = merr_strerrorx(err, found, sizeof(found), ctx_stringify);
-    g_assert_cmpuint(merr_ctx(err), ==, 2);
+    g_assert_cmpint(merr_ctx(err), ==, 2);
     g_assert_cmpint(merr_lineno(err), ==, line);
     g_assert_cmpstr(merr_file(err), ==, file);
     g_assert_cmpuint(found_sz, ==, expected_sz);
@@ -112,7 +115,7 @@ test_merr_none(void)
     found_sz = merr_strerrorx(err, found, sizeof(found), NULL);
     g_assert_cmpint(err, ==, 0);
     g_assert_cmpint(merr_errno(err), ==, 0);
-    g_assert_cmpuint(merr_ctx(err), ==, 0);
+    g_assert_cmpint(merr_ctx(err), ==, 0);
     g_assert_cmpint(merr_lineno(err), ==, 0);
     g_assert_null(merr_file(err));
     g_assert_cmpuint(found_sz, ==, 7);
