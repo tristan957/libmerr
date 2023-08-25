@@ -116,7 +116,7 @@ test_merr_none(void)
     g_assert_cmpint(merr_lineno(err), ==, 0);
     g_assert_null(merr_file(err));
     g_assert_cmpuint(found_sz, ==, 7);
-    g_assert_cmpstr(found, ==, "success");
+    g_assert_cmpstr(found, ==, "Success");
 }
 
 static void

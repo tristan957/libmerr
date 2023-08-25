@@ -146,7 +146,7 @@ merr_strerrorx(const merr_t err, char * const buf, size_t buf_sz, merr_stringify
         buf_sz = 0;
 
     if (!err)
-        return strlcpy(buf, "success", buf_sz);
+        return strlcpy(buf, "Success", buf_sz);
 
     file = merr_file(err);
     if (file) {
