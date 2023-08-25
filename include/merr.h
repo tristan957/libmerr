@@ -53,8 +53,7 @@ extern "C" {
 // Alignment of merr_curr_file in section "merr"
 #define MERR_MAX_PATH_LENGTH (1 << 6)
 
-#define merr_section    __attribute__((section("merr")))
-#define merr_attributes merr_section __attribute__((aligned(MERR_MAX_PATH_LENGTH)))
+#define merr_attributes __attribute__((section("merr"))) __attribute__((aligned(MERR_MAX_PATH_LENGTH)))
 
 static char merr_curr_file[MERR_MAX_PATH_LENGTH] merr_attributes MERR_USED = __BASE_FILE__;
 
