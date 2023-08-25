@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 // Alignment of merr_curr_file in section "merr"
-#define MERR_MAX_PATH_LENGTH (1 << 6)
+#define MERR_MAX_PATH_LENGTH (1U << 6)
 
 #define merr_attributes __attribute__((section("merr"))) __attribute__((aligned(MERR_MAX_PATH_LENGTH)))
 
