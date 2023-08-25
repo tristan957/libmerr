@@ -2,7 +2,5 @@
 #
 # SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
 
-option('max-path-length', type: 'integer', min: 32, value: 64,
-    description: 'Maximum path length of file generating errors (must be power of 2)')
 option('tests', type: 'boolean', value: true,
     description: 'Build tests')
