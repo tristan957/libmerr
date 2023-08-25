@@ -138,75 +138,74 @@ size_t
 merr_strerrorx(const merr_t err, char * const buf, size_t buf_sz, merr_stringify ctx_stringify)
 {
     int ret;
+    uint16_t ctx;
     size_t sz = 0;
     const char *file;
-    const uint16_t ctx = merr_ctx(err);
 
     if (!buf && buf_sz > 0)
         buf_sz = 0;
 
-    if (err) {
-        file = merr_file(err);
+    if (!err)
+        return strlcpy(buf, "success", buf_sz);
 
-        if (file) {
-            const char *ptr;
+    file = merr_file(err);
+    if (file) {
+        const char *ptr;
 
-            // Protect against files that may be too long.
-            ptr = memchr(file, '\0', MERR_MAX_PATH_LENGTH);
-            ret = snprintf(
-                buf, buf_sz, "%*s:%d: ", (int)(ptr ? ptr - file : MERR_MAX_PATH_LENGTH), file,
-                merr_lineno(err));
+        // Protect against files that may be too long.
+        ptr = memchr(file, '\0', MERR_MAX_PATH_LENGTH);
+        ret = snprintf(
+            buf, buf_sz, "%*s:%d: ", (int)(ptr ? ptr - file : MERR_MAX_PATH_LENGTH), file,
+            merr_lineno(err));
+
+        if (ret < 0) {
+            sz = strlcpy(buf, "<failed to format the error message>", buf_sz);
+            goto out;
+        }
+
+        sz += (size_t)ret;
+    }
+
+    if (sz >= buf_sz) {
+        sz += strerror_safe(err, NULL, 0);
+    } else {
+        sz += strerror_safe(err, buf + sz, buf_sz - sz);
+    }
+
+    if (sz >= buf_sz) {
+        ret = snprintf(NULL, 0, " (%d)", merr_errno(err));
+    } else {
+        ret = snprintf(buf + sz, buf_sz - sz, " (%d)", merr_errno(err));
+    }
+
+    if (ret < 0) {
+        // Try to just return what we already have.
+        if (buf_sz > 0)
+            buf[sz - 1] = '\000';
+        goto out;
+    }
+
+    sz += (size_t)ret;
+
+    ctx = merr_ctx(err);
+    if (ctx != 0 && ctx_stringify) {
+        const char *msg = ctx_stringify(ctx);
+
+        if (msg) {
+            if (sz >= buf_sz) {
+                ret = snprintf(NULL, 0, ": %s (%d)", msg, ctx);
+            } else {
+                ret = snprintf(buf + sz, buf_sz - sz, ": %s (%d)", msg, ctx);
+            }
 
             if (ret < 0) {
-                sz = strlcpy(buf, "<failed to format the error message>", buf_sz);
+                // Try to just return what we already have.
+                buf[sz] = '\000';
                 goto out;
             }
 
             sz += (size_t)ret;
         }
-
-        if (sz >= buf_sz) {
-            sz += strerror_safe(err, NULL, 0);
-        } else {
-            sz += strerror_safe(err, buf + sz, buf_sz - sz);
-        }
-
-        if (sz >= buf_sz) {
-            ret = snprintf(NULL, 0, " (%d)", merr_errno(err));
-        } else {
-            ret = snprintf(buf + sz, buf_sz - sz, " (%d)", merr_errno(err));
-        }
-
-        if (ret < 0) {
-            // Try to just return what we already have.
-            if (buf_sz > 0)
-                buf[sz - 1] = '\000';
-            goto out;
-        }
-
-        sz += (size_t)ret;
-
-        if (ctx != 0 && ctx_stringify) {
-            const char *msg = ctx_stringify(ctx);
-
-            if (msg) {
-                if (sz >= buf_sz) {
-                    ret = snprintf(NULL, 0, ": %s (%d)", msg, ctx);
-                } else {
-                    ret = snprintf(buf + sz, buf_sz - sz, ": %s (%d)", msg, ctx);
-                }
-
-                if (ret < 0) {
-                    // Try to just return what we already have.
-                    buf[sz] = '\000';
-                    goto out;
-                }
-
-                sz += (size_t)ret;
-            }
-        }
-    } else {
-        sz = strlcpy(buf, "success", buf_sz);
     }
 
 out:
