@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout libmerr
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Lint
         uses: fsfe/reuse-action@v2
