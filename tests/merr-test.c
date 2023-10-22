@@ -64,7 +64,7 @@ test_merr_long_path(void)
     g_assert_cmpint(err, !=, 0);
 
     expected_sz = (size_t)snprintf(
-        expected, sizeof(expected), "%*s:%d: %s (%d)", MERR_MAX_PATH_LENGTH, merr_file(err),
+        expected, sizeof(expected), "%*s:%d: %s (%d)", (int)MERR_MAX_PATH_LENGTH, merr_file(err),
         merr_lineno(err), strerror(merr_errno(err)), merr_errno(err));
     found_sz = merr_strerrorx(err, found, sizeof(found), ctx_stringify);
     g_assert_cmpuint(found_sz, ==, expected_sz);
@@ -100,11 +100,11 @@ test_merr_with_context(void)
     err = merrx(ENOENT, 2); line = __LINE__;
 #ifndef MERR_PLAIN
     expected_sz = (size_t)snprintf(
-        expected, sizeof(expected), "%s:%d: %s (%d): %s (%u)", file, merr_lineno(err),
+        expected, sizeof(expected), "%s:%d: %s (%d): %s (%d)", file, merr_lineno(err),
         strerror(merr_errno(err)), merr_errno(err), ctx_stringify(merr_ctx(err)), merr_ctx(err));
 #else
     expected_sz = (size_t)snprintf(
-        expected, sizeof(expected), "%s (%d): %s (%u)",
+        expected, sizeof(expected), "%s (%d): %s (%d)",
         strerror(merr_errno(err)), merr_errno(err), ctx_stringify(merr_ctx(err)), merr_ctx(err));
 #endif
 
