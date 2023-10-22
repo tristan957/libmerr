@@ -119,7 +119,7 @@ merr_stringify(int num);
  *
  * @param _func Stringify function.
  */
-#define MERR_STRINGIFY(_func) (merr_stringify)(_func)
+#define MERR_STRINGIFY(_func) (merr_stringify *)(_func)
 
 /**
  * @brief Pack given error number and call-site info into an merr_t.
