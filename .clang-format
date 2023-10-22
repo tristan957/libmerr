@@ -29,6 +29,8 @@ AlwaysBreakTemplateDeclarations: MultiLine
 # AttributeMacros only work with macros that do not take parameters.
 AttributeMacros:
   - MERR_ALWAYS_INLINE
+  - MERR_CONST
+  - MERR_PLAIN_UNUSED
   - MERR_UNUSED
   - MERR_USED
   - MERR_WARN_UNUSED_RESULT
