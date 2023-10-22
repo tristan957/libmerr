@@ -45,8 +45,24 @@ add_project_arguments(
 add_project_arguments(
     cc.get_supported_arguments(
         '-D_POSIX_C_SOURCE=200112L',
+        '-Wconversion',
         '-Wdeclaration-after-statement',
-        '-Wconversion'
+        '-Wdouble-promotion',
+        '-Wduplicated-branches',
+        '-Wduplicated-cond',
+        '-Wendif-labels',
+        '-Wformat=2',
+        '-Wformat-overflow=2',
+        '-Wformat-signedness',
+        '-Wformat-truncation=1',
+        '-Winit-self',
+        '-Wlogical-op',
+        '-Wmissing-prototypes',
+        '-Wnull-dereference',
+        '-Wno-return-local-addr',
+        '-Wshadow',
+        '-Wuninitialized',
+        '-Wvla',
     ),
     language: 'c'
 )
