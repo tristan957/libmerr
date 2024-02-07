@@ -59,7 +59,6 @@ add_project_arguments(
         '-Wlogical-op',
         '-Wmissing-prototypes',
         '-Wnull-dereference',
-        '-Wno-return-local-addr',
         '-Wshadow',
         '-Wuninitialized',
         '-Wvla',
