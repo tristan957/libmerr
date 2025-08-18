@@ -52,7 +52,7 @@ jobs:
             gcc meson glib2-devel
 
       - name: Checkout libmerr
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup
         run: |
@@ -91,7 +91,7 @@ jobs:
             gcc meson glib2-devel libasan libubsan
 
       - name: Checkout libmerr
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup
         run: |
