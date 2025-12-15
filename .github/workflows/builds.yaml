@@ -68,7 +68,7 @@ jobs:
           meson test -C build --print-errorlogs --no-stdsplit
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
@@ -108,7 +108,7 @@ jobs:
           meson test -C build --print-errorlogs --no-stdsplit
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
