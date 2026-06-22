@@ -25,9 +25,6 @@ char merr_base[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_base";
 char merr_bug0[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug0";
 char merr_bug1[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug1";
 char merr_bug2[MERR_MAX_PATH_LENGTH] merr_attributes = "merr_bug2";
-
-extern uint8_t __start_merr;
-extern uint8_t __stop_merr;
 #endif
 
 #ifndef HAVE_STRLCPY
