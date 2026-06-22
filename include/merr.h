@@ -46,10 +46,23 @@ extern "C" {
 // Alignment of merr_curr_file in section "merr"
 #define MERR_MAX_PATH_LENGTH (1U << 6)
 
+#ifdef __APPLE__
+#define MERR_SECTION "__DATA,merr"
+#define merr_start __asm("section$start$__DATA$merr")
+#define merr_stop  __asm("section$end$__DATA$merr")
+#else
+#define MERR_SECTION "merr"
+#define merr_start
+#define merr_stop
+#endif
+
 #define merr_attributes \
-    __attribute__((section("merr"))) __attribute__((aligned(MERR_MAX_PATH_LENGTH)))
+    __attribute__((section(MERR_SECTION))) __attribute__((aligned(MERR_MAX_PATH_LENGTH)))
 
 static char merr_curr_file[MERR_MAX_PATH_LENGTH] merr_attributes MERR_USED = __BASE_FILE__;
+
+extern uint8_t __start_merr merr_start;
+extern uint8_t __stop_merr merr_stop;
 
 #endif
 
