@@ -105,8 +105,8 @@ merr_pack(const int errnum, const int ctx, const char *file, const uint16_t line
 
     off = (file - merr_base) / MERR_MAX_PATH_LENGTH;
 
-    if (((off << MERR_FILE_SHIFT) >> MERR_FILE_SHIFT) == off)
-        err = off << MERR_FILE_SHIFT;
+    if ((int64_t)((uint64_t)off << MERR_FILE_SHIFT) >> MERR_FILE_SHIFT == off)
+        err = (int64_t)((uint64_t)off << MERR_FILE_SHIFT);
 
     err |= ((int64_t)line << MERR_LINE_SHIFT) & MERR_LINE_MASK;
     err |= (ctx << MERR_CTX_SHIFT) & MERR_CTX_MASK;
