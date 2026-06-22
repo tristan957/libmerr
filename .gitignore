@@ -3,5 +3,6 @@
 # SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
 
 /node_modules/
+/result
 /package-lock.json
 /yarn.lock

@@ -9,6 +9,8 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - README.md
+      - .prettierrc.yaml
+      - .github/**/*.yaml
 
 permissions:
   contents: read
@@ -18,23 +20,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  markdownlint:
+  prettier:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: latest
-          cache: npm
-
       - name: Checkout libmerr
         uses: actions/checkout@v7
 
-      - name: Install dependencies
-        run: |
-          npm ci
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Nix store
+        uses: DeterminateSystems/magic-nix-cache-action@v14
 
       - name: Prettier check
         run: |
-          npm run prettier:check
+          nix develop --command prettier --check \
+            README.md \
+            .prettierrc.yaml \
+            .github/**/*.yaml

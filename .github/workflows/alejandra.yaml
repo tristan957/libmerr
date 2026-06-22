@@ -1,14 +1,22 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+# SPDX-FileCopyrightText: Tristan Partin <tristan@partin.io>
 
-name: markdownlint
+name: alejandra
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - README.md
+      - "**.nix"
+      - .github/workflows/alejandra.yaml
+  push:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+"
+    paths:
+      - "**.nix"
+      - .github/workflows/alejandra.yaml
 
 permissions:
   contents: read
@@ -18,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  markdownlint:
+  alejandra:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +41,5 @@ jobs:
       - name: Cache Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v14
 
-      - name: markdownlint check
-        run: |
-          nix develop --command markdownlint-cli2 \
-            README.md
+      - name: Check formatting
+        run: nix run nixpkgs#alejandra -- --check .

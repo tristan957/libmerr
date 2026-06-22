@@ -1,0 +1,11 @@
+version = 1
+
+[[annotations]]
+path = [
+  "flake.lock",
+  "package.json",
+  "VERSION"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Tristan Partin <tristan@partin.io>"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"
