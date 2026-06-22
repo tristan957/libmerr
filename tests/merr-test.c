@@ -25,7 +25,6 @@ extern char merr_bug0[];
 extern char merr_bug1[];
 extern char merr_bug2[];
 
-
 static const char * MERR_CONST
 ctx_stringify(const int ctx)
 {
@@ -35,6 +34,38 @@ ctx_stringify(const int ctx)
 }
 
 #ifndef MERR_PLAIN
+static void
+test_merr_negative_offset(void)
+{
+    merr_t err;
+    const char *file;
+    char *slot;
+
+    /* Walk backwards from merr_base looking for an aligned slot within the
+     * section that has a negative offset.  This mirrors the real scenario
+     * where a merr_curr_file from another translation unit is placed before
+     * merr_base in the section, producing a negative off in merr_pack(). The
+     * old code did `off << MERR_FILE_SHIFT` on a signed int64_t, which is
+     * undefined behavior when off < 0 and was caught by UBSan. */
+    slot = (char *)((uintptr_t)merr_base - MERR_MAX_PATH_LENGTH);
+    if (slot < (char *)&__start_merr) {
+        /* Section has nothing before merr_base; skip rather than fail. */
+        g_test_skip("no slot with negative offset found in merr section");
+        return;
+    }
+
+    err = merr_pack(EAGAIN, 0, slot, 1);
+    g_assert_cmpint(merr_errno(err), ==, EAGAIN);
+
+    file = merr_file(err);
+    g_assert_nonnull(file);
+
+    /* The slot must round-trip: merr_file() should return exactly the pointer
+     * we passed in (adjusted for MERR_REL_SRC_DIR if set, but the slot
+     * contains an empty string so the prefix stripping is a no-op). */
+    g_assert_true(file >= (char *)&__start_merr && file < (char *)&__stop_merr);
+}
+
 static void
 test_merr_bad_file(void)
 {
@@ -192,6 +223,7 @@ main(int argc, char *argv[])
     g_test_init(&argc, &argv, NULL);
 
 #ifndef MERR_PLAIN
+    g_test_add_func("/merr/negative-offset", test_merr_negative_offset);
     g_test_add_func("/merr/bad-file", test_merr_bad_file);
     g_test_add_func("/merr/long-path", test_merr_long_path);
 #endif
