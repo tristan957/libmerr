@@ -71,7 +71,8 @@ jobs:
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
+          name:
+            ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
           path: |
             build/meson-logs/
 
@@ -111,6 +112,7 @@ jobs:
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
+          name:
+            ${{ github.job }}-${{ matrix.buildtype }}-plain-${{ matrix.plain }}
           path: |
             build/meson-logs/

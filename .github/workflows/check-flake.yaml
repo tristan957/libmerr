@@ -1,14 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# SPDX-FileCopyrightText: 2023 Tristan Partin <tristan@partin.io>
+# SPDX-FileCopyrightText: Tristan Partin <tristan@partin.io>
 
-name: markdownlint
+name: check-flake
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - README.md
+      - "**.nix"
+      - flake.lock
+      - .github/workflows/flake-check.yaml
+  push:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+"
+    paths:
+      - "**.nix"
+      - flake.lock
+      - .github/workflows/flake-check.yaml
 
 permissions:
   contents: read
@@ -18,7 +28,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  markdownlint:
+  flake-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +43,5 @@ jobs:
       - name: Cache Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v14
 
-      - name: markdownlint check
-        run: |
-          nix develop --command markdownlint-cli2 \
-            README.md
+      - name: Check flake
+        run: nix flake check
